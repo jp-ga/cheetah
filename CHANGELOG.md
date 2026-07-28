@@ -6,6 +6,8 @@
 
 ### 🚀 Features
 
+- `TransverseDeflectingCavity` now supports `linear` as a `tracking_method`. (see #677) (@cr-xu)
+
 ### 🐛 Bug fixes
 
 ### 🐆 Other
