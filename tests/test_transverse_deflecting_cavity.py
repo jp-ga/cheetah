@@ -4,9 +4,33 @@ import torch
 import cheetah
 
 
+def test_transverse_deflecting_cavity_off():
+    """
+    Test that tracking through a TDC with zero voltage is equivalent to tracking
+    through a drift of the same length.
+    """
+
+    incoming = cheetah.ParticleBeam.from_parameters(energy=torch.tensor(10e6))
+    tdc = cheetah.TransverseDeflectingCavity(
+        length=torch.tensor(0.5),
+        voltage=torch.tensor(0.0),
+        frequency=torch.tensor(1.3e9),
+        phase=torch.tensor(0.0),
+    )
+    drift = cheetah.Drift(length=torch.tensor(0.5))
+
+    outgoing_tdc = tdc.track(incoming)
+    outgoing_drift = drift.track(incoming)
+
+    assert torch.allclose(outgoing_tdc.particles, outgoing_drift.particles)
+
+
 @pytest.mark.parametrize("BeamClass", [cheetah.ParameterBeam, cheetah.ParticleBeam])
 def test_transverse_deflecting_cavity_linear_tracking(BeamClass):
-    """Test that linear TDC tracking supports both Cheetah beam representations."""
+    """
+    Test that linear TDC tracking supports both Cheetah beam representations.
+    """
+
     incoming = BeamClass.from_parameters(energy=torch.tensor(100e6))
     tdc = cheetah.TransverseDeflectingCavity(
         length=torch.tensor(0.4),
