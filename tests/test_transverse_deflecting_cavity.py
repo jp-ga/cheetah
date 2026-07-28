@@ -4,6 +4,23 @@ import torch
 import cheetah
 
 
+@pytest.mark.parametrize("BeamClass", [cheetah.ParameterBeam, cheetah.ParticleBeam])
+def test_transverse_deflecting_cavity_linear_tracking(BeamClass):
+    """Test that linear TDC tracking supports both Cheetah beam representations."""
+    incoming = BeamClass.from_parameters(energy=torch.tensor(100e6))
+    tdc = cheetah.TransverseDeflectingCavity(
+        length=torch.tensor(0.4),
+        voltage=torch.tensor(2e6),
+        phase=torch.tensor(0.125),
+        frequency=torch.tensor(3e9),
+        tracking_method="linear",
+    )
+
+    outgoing = tdc.track(incoming)
+
+    assert outgoing.s == incoming.s + tdc.length
+
+
 @pytest.mark.parametrize(
     "dtype", [torch.float32, torch.float64], ids=["float32", "float64"]
 )
@@ -41,7 +58,8 @@ def test_transverse_deflecting_cavity_drift_kick_drift_tracking(dtype):
     )
 
 
-def test_transverse_deflecting_cavity_energy_length_vectorization():
+@pytest.mark.parametrize("tracking_method", ["linear", "drift_kick_drift"])
+def test_transverse_deflecting_cavity_energy_length_vectorization(tracking_method):
     """
     Test that vectorised tracking through a TDC throws now exception and outputs the
     correct shape, when the input beam's energy and the TDC's length are vectorised.
@@ -57,7 +75,7 @@ def test_transverse_deflecting_cavity_energy_length_vectorization():
         voltage=torch.tensor([[1e7], [2e7], [3e7]]),
         phase=torch.tensor(0.4),
         frequency=torch.tensor(1e9),
-        tracking_method="drift_kick_drift",
+        tracking_method=tracking_method,
     )
 
     outgoing_beam = tdc.track(incoming_beam)
@@ -65,7 +83,8 @@ def test_transverse_deflecting_cavity_energy_length_vectorization():
     assert outgoing_beam.particles.shape[:-2] == torch.Size([3, 2])
 
 
-def test_transverse_deflecting_cavity_energy_phase_vectorization():
+@pytest.mark.parametrize("tracking_method", ["linear", "drift_kick_drift"])
+def test_transverse_deflecting_cavity_energy_phase_vectorization(tracking_method):
     """
     Test that vectorised tracking through a TDC throws now exception and outputs the
     correct shape, when the input beam's energy and the TDC's phase are vectorised.
@@ -81,7 +100,7 @@ def test_transverse_deflecting_cavity_energy_phase_vectorization():
         voltage=torch.tensor(1e7),
         phase=torch.tensor([[0.6], [0.5], [0.4]]),
         frequency=torch.tensor(1e9),
-        tracking_method="drift_kick_drift",
+        tracking_method=tracking_method,
     )
 
     outgoing_beam = tdc.track(incoming_beam)
@@ -89,7 +108,8 @@ def test_transverse_deflecting_cavity_energy_phase_vectorization():
     assert outgoing_beam.particles.shape[:-2] == torch.Size([3, 2])
 
 
-def test_transverse_deflecting_cavity_energy_frequency_vectorization():
+@pytest.mark.parametrize("tracking_method", ["linear", "drift_kick_drift"])
+def test_transverse_deflecting_cavity_energy_frequency_vectorization(tracking_method):
     """
     Test that vectorised tracking through a TDC throws now exception and outputs the
     correct shape, when the input beam's energy and the TDC's frequency are vectorised.
@@ -105,7 +125,7 @@ def test_transverse_deflecting_cavity_energy_frequency_vectorization():
         voltage=torch.tensor(1e7),
         phase=torch.tensor(0.4),
         frequency=torch.tensor([[1e9], [2e9], [3e9]]),
-        tracking_method="drift_kick_drift",
+        tracking_method=tracking_method,
     )
 
     _ = tdc3.track(incoming_beam)
@@ -113,7 +133,8 @@ def test_transverse_deflecting_cavity_energy_frequency_vectorization():
     assert _.particles.shape[:-2] == torch.Size([3, 2])
 
 
-def test_transverse_deflecting_cavity_all_parameters_vectorization():
+@pytest.mark.parametrize("tracking_method", ["linear", "drift_kick_drift"])
+def test_transverse_deflecting_cavity_all_parameters_vectorization(tracking_method):
     """
     Test that vectorised tracking through a TDC throws now exception and outputs the
     correct shape, when all parameters are vectorised.
@@ -129,7 +150,7 @@ def test_transverse_deflecting_cavity_all_parameters_vectorization():
         voltage=torch.ones([4, 1, 1, 1]) * 1e7,
         phase=torch.ones([1, 3, 1, 1]) * 0.4,
         frequency=torch.ones([1, 1, 2, 1]) * 1e9,
-        tracking_method="drift_kick_drift",
+        tracking_method=tracking_method,
     )
 
     outgoing_beam = tdc.track(incoming_beam)
