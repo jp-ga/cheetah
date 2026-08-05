@@ -757,7 +757,6 @@ def test_transverse_deflecting_cavity(phase):
     outgoing_beam = cheetah_cavity.track(incoming_beam)
 
     # Compare
-    # The 6 particle dimensions are separated to allow for different tolerances
     cheetah_outgoing_particles = outgoing_beam.particles.cpu().numpy()[:, :6]
     ocelot_outgoing_particles = outgoing_parray.rparticles.transpose()
 
