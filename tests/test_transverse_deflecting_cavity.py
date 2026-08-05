@@ -19,7 +19,12 @@ def test_transverse_deflecting_cavity_off(tracking_method):
         frequency=torch.tensor(1.3e9),
         phase=torch.tensor(0.0),
         tracking_method=tracking_method,
+        num_steps=1,  # Made explicit to fix the number of drifts needed below.
     )
+
+    # Drift-kick-drift tracking applies two half drifts which are not identical to one
+    # full length drift. This behaviour is reproduced here. Irrelevant for linear
+    # tracking.
     half_drift = cheetah.Drift(length=length / 2.0, tracking_method=tracking_method)
     full_drift = cheetah.Segment(elements=[half_drift, half_drift])
 
