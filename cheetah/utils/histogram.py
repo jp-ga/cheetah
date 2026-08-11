@@ -1,5 +1,6 @@
 import torch
 
+
 def _bin_centers_to_edges(centers: torch.Tensor) -> torch.Tensor:
     """Convert a 1D tensor of evenly-spaced bin centers to bin edges."""
     if centers.numel() < 2:
@@ -77,14 +78,16 @@ def vectorized_histogram_2d(
     bins_x1 = x1_edges.numel() - 1
     bins_x2 = x2_edges.numel() - 1
 
-    ix1 = (torch.bucketize(x1_flat, x1_edges) - 1).clamp(0, bins_x1 - 1).long()  # (B, N)
-    ix2 = (torch.bucketize(x2_flat, x2_edges) - 1).clamp(0, bins_x2 - 1).long()  # (B, N)
+    ix1 = (
+        (torch.bucketize(x1_flat, x1_edges) - 1).clamp(0, bins_x1 - 1).long()
+    )  # (B, N)
+    ix2 = (
+        (torch.bucketize(x2_flat, x2_edges) - 1).clamp(0, bins_x2 - 1).long()
+    )  # (B, N)
 
     idx_flat = ix1 * bins_x2 + ix2  # (B, N)
 
-    offset = torch.arange(B, device=device, dtype=idx_flat.dtype) * (
-        bins_x1 * bins_x2
-    )
+    offset = torch.arange(B, device=device, dtype=idx_flat.dtype) * (bins_x1 * bins_x2)
     idx_flat_offset = (idx_flat + offset.unsqueeze(1)).reshape(-1)
 
     weights_flat = weights_flat.reshape(-1).to(dtype)
