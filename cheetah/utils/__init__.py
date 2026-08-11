@@ -7,19 +7,21 @@ from .histogram import vectorized_histogram_2d  # noqa: F401
 from .kde import kde_histogram_1d, kde_histogram_2d  # noqa: F401
 from .names import UniqueNameGenerator, merge_element_names  # noqa: F401
 from .physics import compute_relativistic_factors  # noqa: F401
-from .plot import format_axis_as_percentage  # noqa: F401
-from .plot import format_axis_with_prefixed_unit
-from .statistics import match_distribution_moments  # noqa: F401
-from .statistics import (
+from .plot import (  # noqa: F401
+    format_axis_as_percentage,
+    format_axis_with_prefixed_unit,
+)
+from .statistics import (  # noqa: F401
+    match_distribution_moments,
     unbiased_weighted_covariance,
     unbiased_weighted_covariance_matrix,
     unbiased_weighted_std,
     unbiased_weighted_variance,
 )
 from .vector import squash_index_for_unavailable_dims  # noqa: F401
-from .warnings import DirtyNameWarning  # noqa: F401
-from .warnings import (
+from .warnings import (  # noqa: F401
     DefaultParameterWarning,
+    DirtyNameWarning,
     NoBeamPropertiesInLatticeWarning,
     NotUnderstoodPropertyWarning,
     PhysicsWarning,
