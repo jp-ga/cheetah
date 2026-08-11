@@ -303,7 +303,7 @@ def test_vectorized_solenoid(BeamClass):
 
 
 @pytest.mark.parametrize("BeamClass", [cheetah.ParticleBeam])
-@pytest.mark.parametrize("method", ["kde"])  # Currently only KDE supports vectorisation
+@pytest.mark.parametrize("method", ["kde", "histogram"])
 def test_vectorized_screen_2d(BeamClass, method):
     """
     Test that a vectorized `Screen` is able to track a particle beam and produce a
