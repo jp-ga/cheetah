@@ -291,16 +291,18 @@ class Screen(Element):
             image = dist.log_prob(pos).exp().mT
         elif isinstance(read_beam, ParticleBeam):
             if self.method == "histogram":
-                # # Catch vectorisation, which is currently not supported by "histogram"
+                # # Catch vectorisation, which is currently not supported by
+                # # "histogram"
                 # if (
                 #     len(read_beam.particles.shape) > 2
                 #     or len(read_beam.particle_charges.shape) > 1
                 #     or len(read_beam.energy.shape) > 0
                 # ):
                 #     raise NotImplementedError(
-                #         "The `'histogram'` method of `Screen` does not support "
-                #         "vectorization. Use `'kde'` instead. If this is a feature you "
-                #         "would like to see, please open an issue on GitHub."
+                #         "The `'histogram'` method of `Screen` does not "
+                #         "support vectorization. Use `'kde'` instead. If "
+                #         "this is a feature you would like to see, please "
+                #         "open an issue on GitHub."
                 #     )
 
                 # image_transposed, _ = torch.histogramdd(
