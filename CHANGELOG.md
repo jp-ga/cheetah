@@ -11,6 +11,8 @@
 
 ### 🐛 Bug fixes
 
+- Fix the following Bmad lattice conversion bugs: skips parsing lines with overlay or group definitions, wildcard element references, scientific notation, +/- before unary operators, maps type/alias fields to element metadata to reduce the number of warnings (see #663) (@roussel-ryan)
+
 ### 🐆 Other
 
 ### 🌟 First Time Contributors
