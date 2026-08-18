@@ -204,6 +204,20 @@ def convert_element(
                 sanitize_name=sanitize_name,
                 metadata=metadata,
             )
+        elif bmad_parsed["element_type"] == "crab_cavity":
+            validate_understood_properties(
+                shared_properties + ["l", "rf_frequency", "voltage", "phi0"],
+                bmad_parsed,
+            )
+            return cheetah.TransverseDeflectingCavity(
+                length=torch.tensor(bmad_parsed["l"], **factory_kwargs),
+                voltage=torch.tensor(bmad_parsed.get("voltage", 0.0), **factory_kwargs),
+                phase=-(torch.tensor(bmad_parsed.get("phi0", 0.0), **factory_kwargs)),
+                frequency=torch.tensor(bmad_parsed["rf_frequency"], **factory_kwargs),
+                name=name,
+                sanitize_name=sanitize_name,
+                metadata=metadata,
+            )
         elif bmad_parsed["element_type"] == "rcollimator":
             validate_understood_properties(
                 shared_properties + ["l", "x_limit", "y_limit"],
@@ -283,20 +297,6 @@ def convert_element(
             validate_understood_properties(shared_properties + ["l"], bmad_parsed)
             return cheetah.Drift(
                 length=torch.tensor(bmad_parsed.get("l", 0.0), **factory_kwargs),
-                name=name,
-                sanitize_name=sanitize_name,
-                metadata=metadata,
-            )
-        elif bmad_parsed["element_type"] == "crab_cavity":
-            validate_understood_properties(
-                shared_properties + ["l", "rf_frequency", "voltage", "phi0"],
-                bmad_parsed,
-            )
-            return cheetah.TransverseDeflectingCavity(
-                length=torch.tensor(bmad_parsed["l"], **factory_kwargs),
-                voltage=torch.tensor(bmad_parsed.get("voltage", 0.0), **factory_kwargs),
-                phase=-(torch.tensor(bmad_parsed.get("phi0", 0.0), **factory_kwargs)),
-                frequency=torch.tensor(bmad_parsed["rf_frequency"], **factory_kwargs),
                 name=name,
                 sanitize_name=sanitize_name,
                 metadata=metadata,
