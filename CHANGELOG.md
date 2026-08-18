@@ -13,7 +13,7 @@
 
 ### 🐆 Other
 
-- Update openPMD dependency to renamed package - (see #684) (@jank324)
+- Update openPMD dependency to renamed package (see #684) (@jank324)
 
 ### 🌟 First Time Contributors
 
