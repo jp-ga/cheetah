@@ -158,7 +158,7 @@ def _tokenize_expression(expression: str, context: dict) -> list[str]:
 
     for char in expression:
         if char.isspace() or char in "+-*/^()[]":
-            # Keep scientific-notation exponents in one token (e.g. 0.750e-3).
+            # Keep scientific-notation exponents in one token (e.g. 0.750e-3)
             if (
                 char in "+-"
                 and current_key is None
