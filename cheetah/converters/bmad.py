@@ -61,9 +61,7 @@ def convert_element(
         if bmad_parsed["element_type"] == "marker":
             validate_understood_properties(shared_properties, bmad_parsed)
             return cheetah.Marker(
-                name=name,
-                sanitize_name=sanitize_name,
-                metadata=metadata,
+                name=name, sanitize_name=sanitize_name, metadata=metadata
             )
         elif bmad_parsed["element_type"] == "monitor":
             validate_understood_properties(shared_properties + ["l"], bmad_parsed)
@@ -76,9 +74,7 @@ def convert_element(
                 )
             else:
                 return cheetah.Marker(
-                    name=name,
-                    sanitize_name=sanitize_name,
-                    metadata=metadata,
+                    name=name, sanitize_name=sanitize_name, metadata=metadata
                 )
         elif bmad_parsed["element_type"] == "instrument":
             validate_understood_properties(shared_properties + ["l"], bmad_parsed)
@@ -91,9 +87,7 @@ def convert_element(
                 )
             else:
                 return cheetah.Marker(
-                    name=name,
-                    sanitize_name=sanitize_name,
-                    metadata=metadata,
+                    name=name, sanitize_name=sanitize_name, metadata=metadata
                 )
         elif bmad_parsed["element_type"] == "pipe":
             validate_understood_properties(
