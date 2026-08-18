@@ -28,9 +28,7 @@ ELEMENT_DEFINITION_PATTERN = (
 )
 LINE_DEFINITION_PATTERN = f"({ELEMENT_NAME_PATTERN})" + r"\s*\:\s*line\s*=\s*\((.*)\)"
 USE_LINE_PATTERN = r'use\s*\,\s*([a-z0-9_]+|"[a-z0-9_\-\.\:]+")'
-CONTROL_DEFINITION_PATTERN = (
-    rf"({ELEMENT_NAME_PATTERN})\s*:\s*(?:overlay|group)\b.*"
-)
+CONTROL_DEFINITION_PATTERN = rf"({ELEMENT_NAME_PATTERN})\s*:\s*(?:overlay|group)\b.*"
 
 
 def read_clean_lines(lattice_file_path: Path) -> list[str]:
