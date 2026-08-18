@@ -913,10 +913,8 @@ class ParticleBeam(Beam):
         try:
             import beamphysics as openpmd
         except ImportError:
-            raise ImportError(
-                """To use the openPMD beam import, beamphysics must be
-                installed."""
-            )
+            raise ImportError("""To use the openPMD beam import, beamphysics must be
+                installed.""")
 
         particle_group = openpmd.ParticleGroup(path)
         return cls.from_openpmd_particlegroup(
@@ -996,10 +994,8 @@ class ParticleBeam(Beam):
         try:
             import beamphysics as openpmd
         except ImportError:
-            raise ImportError(
-                """To use the openPMD beam export, beamphysics must be
-                installed."""
-            )
+            raise ImportError("""To use the openPMD beam export, beamphysics must be
+                installed.""")
 
         # For now only support non-vectorised particle distributions
         if len(self.particles.shape) != 2:
