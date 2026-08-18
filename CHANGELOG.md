@@ -13,6 +13,8 @@
 
 ### 🐆 Other
 
+- Update openPMD dependency to renamed package (see #684) (@jank324)
+
 ### 🌟 First Time Contributors
 
 ## [v0.8.4](https://github.com/desy-ml/cheetah/releases/tag/v0.8.4) (2026-07-23)
