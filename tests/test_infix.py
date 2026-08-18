@@ -103,7 +103,7 @@ def test_infix_expression_with_unary_minus_before_function_call():
     call is correctly evaluated.
     """
     expression = "-sin(argw)*sqrt(kqwig)"
-    context = {"argw": math.pi / 2, "kqwig": 4}
+    context = {"argw": math.pi / 2.0, "kqwig": 4.0}
 
     assert infix.evaluate_expression(expression, context) == pytest.approx(-2.0)
 
