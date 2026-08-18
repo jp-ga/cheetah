@@ -1,4 +1,4 @@
-beamphysics
+openpmd-beamphysics>=0.14.0
 ocelot-collab
 pytest
 pytest-benchmark
