@@ -1,6 +1,5 @@
 import os
 import warnings
-from copy import deepcopy
 from pathlib import Path
 
 import torch
@@ -42,12 +41,12 @@ def convert_element(
     }
     bmad_parsed = context[name]
     metadata = (
-        deepcopy(bmad_parsed.get("metadata", {}))
+        {k: bmad_parsed[k] for k in ["alias", "type"] if k in bmad_parsed}
         if isinstance(bmad_parsed, dict)
         else {}
     )
 
-    shared_properties = ["element_type", "alias", "type", "metadata"]
+    shared_properties = ["element_type", "alias", "type"]
 
     if isinstance(bmad_parsed, list):
         return cheetah.Segment(
@@ -296,13 +295,13 @@ def convert_element(
             )
         elif bmad_parsed["element_type"] == "crab_cavity":
             validate_understood_properties(
-                shared_properties + ["l", "rf_frequency", "voltage", "phi"],
+                shared_properties + ["l", "rf_frequency", "voltage", "phi0"],
                 bmad_parsed,
             )
             return cheetah.TransverseDeflectingCavity(
                 length=torch.tensor(bmad_parsed["l"], **factory_kwargs),
                 voltage=torch.tensor(bmad_parsed.get("voltage", 0.0), **factory_kwargs),
-                phase=-(torch.tensor(bmad_parsed.get("phi", 0.0), **factory_kwargs)),
+                phase=-(torch.tensor(bmad_parsed.get("phi0", 0.0), **factory_kwargs)),
                 frequency=torch.tensor(bmad_parsed["rf_frequency"], **factory_kwargs),
                 name=name,
                 sanitize_name=sanitize_name,

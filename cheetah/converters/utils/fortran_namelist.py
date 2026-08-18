@@ -28,16 +28,8 @@ ELEMENT_DEFINITION_PATTERN = (
 )
 LINE_DEFINITION_PATTERN = f"({ELEMENT_NAME_PATTERN})" + r"\s*\:\s*line\s*=\s*\((.*)\)"
 USE_LINE_PATTERN = r'use\s*\,\s*([a-z0-9_]+|"[a-z0-9_\-\.\:]+")'
-OVERLAY_DEFINITION_PATTERN = (
-    f"({ELEMENT_NAME_PATTERN})" r"\s*\:\s*overlay\s*=\s*\{(.*)\}\s*\,\s*var\s*=\s*"
-)
-OVERLAY_KNOT_BASED_PATTERN = (
-    OVERLAY_DEFINITION_PATTERN + r"\{\s*([a-z0-9_]+)\s*\}\s*\,\s*x_knot\s*=\s*\{(.*)\}"
-)
-OVERLAY_EXPRESSION_BASED_PATTERN = OVERLAY_DEFINITION_PATTERN + r"\{(.*)\}\s*(\,.*)*"
-GROUP_DEFINITION_PATTERN = (
-    f"({ELEMENT_NAME_PATTERN})"
-    + r"\s*\:\s*group\s*=\s*\{(.*)\}\s*\,\s*var\s*=\s*\{(.*)\}(\,.*)*"
+CONTROL_DEFINITION_PATTERN = (
+    rf"({ELEMENT_NAME_PATTERN})\s*:\s*(?:overlay|group)\b.*"
 )
 
 
@@ -147,6 +139,12 @@ def evaluate_expression(expression: str, context: dict) -> Any:
     except ValueError:
         pass
 
+    # Check against string literals enclosed in quotes
+    if (expression.startswith('"') and expression.endswith('"')) or (
+        expression.startswith("'") and expression.endswith("'")
+    ):
+        return expression[1:-1]
+
     # Check against allowed keywords
     if expression in ["open", "electron", "t", "f", "traveling_wave", "full"]:
         return expression
@@ -222,21 +220,10 @@ def assign_property(line: str, context: dict) -> dict:
     property_name = match.group(2).strip()
     property_expression = match.group(3).strip()  # TODO: Evaluate expression first
 
-    if "*" in object_name or "%" in object_name:
+    if "*" in object_name or "%" in object_name or "::" in object_name:
         object_names = resolve_object_name_wildcard(object_name, context)
     else:
         object_names = [object_name]
-
-    if property_name in {"type", "alias"}:
-        metadata_value = property_expression.strip('"')
-
-        for name in object_names:
-            if name not in context:
-                context[name] = {}
-            metadata = context[name].setdefault("metadata", {})
-            metadata[property_name] = metadata_value
-
-        return context
 
     expression_result = evaluate_expression(property_expression, context)
 
@@ -297,17 +284,13 @@ def define_element(line: str, context: dict) -> dict:
         for property_string in property_matches:
             property_string = property_string.strip()
 
-            property_name, property_expression = property_string.split("=")
+            property_name, property_expression = property_string.split("=", maxsplit=1)
             property_name = property_name.strip()
             property_expression = property_expression.strip()
 
-            if property_name in {"type", "alias"}:
-                metadata = element_properties.setdefault("metadata", {})
-                metadata[property_name] = property_expression.strip('"')
-            else:
-                element_properties[property_name] = evaluate_expression(
-                    property_expression, context
-                )
+            element_properties[property_name] = evaluate_expression(
+                property_expression, context
+            )
 
     context[element_name] = element_properties
 
@@ -336,50 +319,6 @@ def define_line(line: str, context: dict) -> dict:
         line_elements.append(element_name)
 
     context[line_name] = line_elements
-
-    return context
-
-
-def define_overlay(line: str, context: dict) -> dict:
-    """
-    Define an overlay in the context.
-
-    :param line: Line of an overlay definition to be parsed.
-    :param context: Dictionary of variables to define the overlay in and from which to
-        read variables.
-    :return: Updated context.
-    """
-
-    expression_match = re.fullmatch(OVERLAY_EXPRESSION_BASED_PATTERN, line)
-    knot_match = re.fullmatch(OVERLAY_KNOT_BASED_PATTERN, line)
-
-    if knot_match:
-        overlay_name = knot_match.group(1).strip()
-        overlay_definition = knot_match.group(2).strip()
-        overlay_variable = knot_match.group(3).strip()
-        overlay_x_knot = knot_match.group(4).strip()
-
-        context[overlay_name] = {
-            "overlay_definition": overlay_definition,
-            "overlay_variable": overlay_variable,
-            "overlay_x_knot": overlay_x_knot,
-        }
-    elif expression_match:
-        overlay_name = expression_match.group(1).strip()
-        overlay_definition = expression_match.group(2).strip()
-        overlay_variables = expression_match.group(3).strip()
-        if expression_match.group(4) is not None:
-            overlay_parameters = expression_match.group(4).strip()[1:].strip()
-        else:
-            overlay_parameters = None
-
-        context[overlay_name] = {
-            "overlay_definition": overlay_definition,
-            "overlay_variables": overlay_variables,
-            "overlay_parameters": overlay_parameters,
-        }
-    else:
-        raise ValueError(f"Overlay definition {line} not understood.")
 
     return context
 
@@ -440,13 +379,8 @@ def parse_lines(lines: str) -> dict:
             context = assign_variable(line, context)
         elif re.fullmatch(LINE_DEFINITION_PATTERN, line):
             context = define_line(line, context)
-        elif re.fullmatch(OVERLAY_KNOT_BASED_PATTERN, line) or re.fullmatch(
-            OVERLAY_EXPRESSION_BASED_PATTERN, line
-        ):
-            # Overlay definitions are currently not converted; skip for simplicity.
-            continue
-        elif re.fullmatch(GROUP_DEFINITION_PATTERN, line):
-            # Group definitions are control entries; skip for simplicity.
+        elif re.fullmatch(CONTROL_DEFINITION_PATTERN, line):
+            # Overlay and group definitions are control entries; skip for simplicity.
             continue
         elif re.fullmatch(ELEMENT_DEFINITION_PATTERN, line):
             context = define_element(line, context)
