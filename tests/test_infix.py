@@ -108,6 +108,19 @@ def test_infix_expression_with_unary_minus_before_function_call():
     assert infix.evaluate_expression(expression, context) == pytest.approx(-2.0)
 
 
+def test_infix_unary_sign_exponentiation_precedence():
+    """
+    Test that exponentiation has higher precedence than unary signs (e.g. -2^2 == -4).
+    """
+    assert infix.evaluate_expression("-2^2") == -4.0
+    assert infix.evaluate_expression("(-2)^2") == 4.0
+    assert infix.evaluate_expression("2^-3") == pytest.approx(0.125)
+
+    context = {"x": math.pi / 2.0}
+    assert infix.evaluate_expression("-sin(x)^2", context) == pytest.approx(-1.0)
+    assert infix.evaluate_expression("(-sin(x))^2", context) == pytest.approx(1.0)
+
+
 def test_infix_scientific_notation():
     """
     Test that numbers in scientific notation with standard ('e'/'E') exponents are
