@@ -3,27 +3,26 @@ import pytest
 from cheetah.converters.utils.fortran_namelist import evaluate_expression, parse_lines
 
 
-def test_evaluate_expression():
+def test_evaluate_expression_with_context():
     """
-    Test evaluating expressions in the Fortran namelist parser, including variables,
-    scientific notation, unary signs, and quoted string literals.
+    Test evaluating expressions with context variables, scientific notation, and unary
+    signs in the Fortran namelist parser.
     """
     context = {"mc2": 0.511750}
 
-    value = evaluate_expression("mc2+0.750e-3", context)
-    assert value == pytest.approx(context["mc2"] + 0.750e-3)
+    assert evaluate_expression("mc2+0.750e-3", context) == pytest.approx(
+        context["mc2"] + 0.750e-3
+    )
+    assert evaluate_expression("+mc2", context) == pytest.approx(context["mc2"])
+    assert evaluate_expression("-mc2", context) == pytest.approx(-context["mc2"])
 
-    value = evaluate_expression("+mc2", context)
-    assert value == pytest.approx(context["mc2"])
 
-    value = evaluate_expression("-mc2", context)
-    assert value == pytest.approx(-context["mc2"])
-
-    value = evaluate_expression('"test_string"', context)
-    assert value == "test_string"
-
-    value = evaluate_expression("'single_quoted'", context)
-    assert value == "single_quoted"
+def test_evaluate_quoted_strings():
+    """
+    Test evaluating quoted string literals in the Fortran namelist parser.
+    """
+    assert evaluate_expression('"test_string"', {}) == "test_string"
+    assert evaluate_expression("'single_quoted'", {}) == "single_quoted"
 
 
 def test_define_element_string_attributes():
