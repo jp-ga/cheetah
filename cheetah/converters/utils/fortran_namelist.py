@@ -168,14 +168,10 @@ def evaluate_expression(expression: str, context: dict) -> Any:
             return expression
 
 
-def resolve_object_name_wildcard(wildcard_pattern: str, context: dict) -> list:
+def resolve_object_name_wildcard(wildcard_pattern: str, context: dict) -> list[str]:
     """
-    Return a list of object names that match the given wildcard pattern.
-
-    :param wildcard_pattern: Wildcard pattern to match.
-    :param context: Dictionary of variables among which to search for matching object.
-    :return: List of object names that match the given wildcard pattern, both in terms
-        of name and element type.
+    Return a list of element names in context matching a name pattern and/or type
+    prefix.
     """
     if "::" in wildcard_pattern:
         object_type, object_name = wildcard_pattern.split("::", maxsplit=1)
@@ -183,23 +179,14 @@ def resolve_object_name_wildcard(wildcard_pattern: str, context: dict) -> list:
         object_type, object_name = None, wildcard_pattern
 
     pattern = object_name.replace("*", ".*").replace("%", ".")
-    name_matching_keys = [key for key in context if re.fullmatch(pattern, key)]
 
-    # For typed wildcards (e.g. "lcavity::*"), match both by name and element type.
-    if object_type is not None:
-        return [
-            key
-            for key in name_matching_keys
-            if isinstance(context[key], dict)
-            and "element_type" in context[key]
-            and context[key]["element_type"] == object_type
-        ]
-
-    # For plain wildcards (e.g. "l0*"), only target actual parsed elements.
     return [
-        key
-        for key in name_matching_keys
-        if isinstance(context[key], dict) and "element_type" in context[key]
+        name
+        for name, element in context.items()
+        if isinstance(element, dict)
+        and "element_type" in element
+        and (object_type is None or element["element_type"] == object_type)
+        and re.fullmatch(pattern, name)
     ]
 
 
