@@ -11,7 +11,7 @@
 
 ### 🐛 Bug fixes
 
-- Fix Bmad lattice conversion issues with overlay and group definitions, wildcard element references, scientific notation in expressions, unary signs, and mapping of `type` and `alias` fields to element `metadata` (see #663) (@roussel-ryan, @jank324)
+- Fix Bmad lattice conversion issues with overlay and group definitions, wildcard element references, scientific notation in expressions, unary signs, and mapping of `type` and `alias` fields to element `metadata`. (see #663) (@roussel-ryan, @jank324)
 
 ### 🐆 Other
 
